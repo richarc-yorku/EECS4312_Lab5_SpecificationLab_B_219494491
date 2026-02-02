@@ -1,6 +1,6 @@
 ## TODO:
-## Student Name:
-## Student ID: 
+## Student Name: Richard Carmichael
+## Student ID: 219494491
 
 # Is Resource Allocation Feasible Lab Repository
 
