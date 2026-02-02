@@ -1,10 +1,149 @@
 ## Student Name:
 ## Student ID: 
 
-Prompt 1: "Copy paste your question"
-LLM Response 1: "Copy paste LLMs response"
+Prompt 1: "def is_allocation_feasible( resources: Dict[str, Number], requests: List[Dict[str, Number]] ) -> bool: """ Determine whether a set of resource requests can be satisfied given limited capacities. Args: resources : Dict[str, Number], Mapping from resource name to total available capacity. requests : List[Dict[str, Number]], List of requests. Each request is a mapping from resource name to the amount required. Returns: True if the allocation is feasible, False otherwise. """"
+LLM Response 1: "You’re on the right track defining a function to check if a set of resource requests can be satisfied. Here’s a full implementation for is_allocation_feasible:
+
+from typing import Dict, List, Union
+
+Number = Union[int, float]
+
+def is_allocation_feasible(
+    resources: Dict[str, Number],
+    requests: List[Dict[str, Number]]
+) -> bool:
+    """
+    Determine whether a set of resource requests can be satisfied given limited capacities.
+
+    Args:
+        resources : Dict[str, Number], Mapping from resource name to total available capacity.
+        requests : List[Dict[str, Number]], List of requests. Each request is a mapping from resource name to the amount required.
+
+    Returns:
+        True if the allocation is feasible, False otherwise.
+    """
+    # Make a copy of resources so we don't mutate the input
+    remaining_resources = resources.copy()
+
+    # Iterate over each request
+    for request in requests:
+        for resource, amount in request.items():
+            # If the resource does not exist in available resources, allocation is impossible
+            if resource not in remaining_resources:
+                return False
+            
+            # If the requested amount exceeds the available amount, allocation fails
+            if remaining_resources[resource] < amount:
+                return False
+            
+            # Subtract the allocated amount
+            remaining_resources[resource] -= amount
+
+    # All requests can be satisfied
+    return True
+
+✅ How it works:
+
+Copy the resources dictionary to avoid mutating the original.
+
+Iterate over each request.
+
+Check if each resource exists and whether there is enough available.
+
+Subtract the allocated amount if feasible.
+
+Return True only if all requests fit within the capacities.
+
+Example usage:
+
+resources = {"CPU": 10, "RAM": 32}
+requests = [{"CPU": 3, "RAM": 8}, {"CPU": 5, "RAM": 16}]
+print(is_allocation_feasible(resources, requests))  # True
+
+requests = [{"CPU": 3, "RAM": 8}, {"CPU": 8, "RAM": 16}]
+print(is_allocation_feasible(resources, requests))  # False
+
+
+If you want, I can also show a more efficient version using collections.Counter that automatically handles summing all requests per resource. This can simplify the logic when you have many requests.
+
+Do you want me to show that version?"
 
 --------------------------------------------------
-Prompt 2: "Copy paste your question"
-LLM Response 2: "Copy paste LLMs response"
+Prompt 2: "validate request and resources"
+LLM Response 2: "Got it! You want the function to validate the input before checking feasibility. This means ensuring that:
+
+resources is a dictionary with numeric values.
+
+requests is a list of dictionaries, each with numeric values.
+
+No negative amounts are allowed.
+
+Here’s an updated version with validation:
+
+from typing import Dict, List, Union
+
+Number = Union[int, float]
+
+def is_allocation_feasible(
+    resources: Dict[str, Number],
+    requests: List[Dict[str, Number]]
+) -> bool:
+    """
+    Determine whether a set of resource requests can be satisfied given limited capacities.
+    Validates the inputs to ensure all values are numeric and non-negative.
+
+    Args:
+        resources : Dict[str, Number], Mapping from resource name to total available capacity.
+        requests : List[Dict[str, Number]], List of requests. Each request is a mapping from resource name to the amount required.
+
+    Returns:
+        True if the allocation is feasible, False otherwise.
+    """
+
+    # --- Validate resources ---
+    if not isinstance(resources, dict):
+        raise ValueError("Resources must be a dictionary")
+    for key, value in resources.items():
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"Resource value for '{key}' must be a number")
+        if value < 0:
+            raise ValueError(f"Resource '{key}' cannot have negative capacity")
+
+    # --- Validate requests ---
+    if not isinstance(requests, list):
+        raise ValueError("Requests must be a list of dictionaries")
+    for idx, req in enumerate(requests):
+        if not isinstance(req, dict):
+            raise ValueError(f"Request at index {idx} must be a dictionary")
+        for key, value in req.items():
+            if not isinstance(value, (int, float)):
+                raise ValueError(f"Request amount for '{key}' in request {idx} must be a number")
+            if value < 0:
+                raise ValueError(f"Request for '{key}' in request {idx} cannot be negative")
+
+    # --- Check feasibility ---
+    remaining_resources = resources.copy()
+    for request in requests:
+        for resource, amount in request.items():
+            if resource not in remaining_resources:
+                return False
+            if remaining_resources[resource] < amount:
+                return False
+            remaining_resources[resource] -= amount
+
+    return True
+
+✅ Example Usage
+resources = {"CPU": 10, "RAM": 32}
+requests = [{"CPU": 3, "RAM": 8}, {"CPU": 5, "RAM": 16}]
+print(is_allocation_feasible(resources, requests))  # True
+
+# Invalid request (negative value)
+requests_invalid = [{"CPU": -2, "RAM": 8}]
+# is_allocation_feasible(resources, requests_invalid)  # Raises ValueError
+
+
+If you want, I can also enhance it to automatically ignore unknown resources in requests instead of failing, which is often useful in real-world allocation systems.
+
+Do you want me to add that behavior?"
 --------------------------------------------------
