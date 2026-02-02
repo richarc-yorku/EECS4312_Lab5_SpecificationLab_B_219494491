@@ -1,5 +1,5 @@
-## Student Name:
-## Student ID: 
+## Student Name: Richard Carmichael
+## Student ID: 219494491
 
 """
 Public test suite for the meeting slot suggestion exercise.
@@ -45,4 +45,30 @@ def test_non_dict_request_raises():
     with pytest.raises(ValueError):
         is_allocation_feasible(resources, requests)
 
-"""TODO: Add at least 5 additional test cases to test your implementation."""
+def test_invalid_resource_type():
+    resources = "break"
+    requests = [{'cpu': 3}, {'cpu': 4}, {'cpu': 3}]
+    with pytest.raises(ValueError):
+        is_allocation_feasible(resources, requests)
+
+def test_invalid_resource_number():
+    resources = {'cpu': -20}
+    requests = [{'cpu': 3}, {'cpu': 4}, {'cpu': 3}]
+    with pytest.raises(ValueError):
+        is_allocation_feasible(resources, requests)
+
+def test_invalid_request_type():
+    resources = {'cpu': 10}
+    requests = "break"
+    with pytest.raises(ValueError):
+        is_allocation_feasible(resources, requests)
+
+def test_invalid_request_number():
+    resources = {'cpu': 1000}
+    requests = [{'cpu': 99.2}, {'cpu': 24}, {'cpu': 300}]
+    assert is_allocation_feasible(resources, requests) is True
+
+def test_all_good():
+    resources = {'cpu': 1000}
+    requests = [{'cpu': 99}, {'cpu': 24}, {'cpu': 300}]
+    assert is_allocation_feasible(resources, requests) is True
